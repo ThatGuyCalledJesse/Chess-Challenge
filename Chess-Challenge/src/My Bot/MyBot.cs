@@ -62,6 +62,21 @@ public class MyBot : IChessBot
         return isMoveDraw;
     }
 
+    private Move searchForCheckmate(Board board, Move[] moves)
+    {
+        foreach (Move move in moves)
+        {
+            board.MakeMove(move);
+            if (board.IsInCheckmate())
+            {
+                board.UndoMove(move);
+                return move;
+            }
+            board.UndoMove(move);
+        }
+        return Move.NullMove;
+    }
+
     private Move SelectBestMove(Board board, Move[] moves)
     {
         List<Move> nonDrawMoves = moves.Where(move => !isDraw(board, move)).ToList();
@@ -82,6 +97,8 @@ public class MyBot : IChessBot
         string boardFen = board.GetFenString();
         Move[] moves = board.GetLegalMoves();
         Move[] allCaptureMoves = board.GetLegalMoves(true);
+
+        searchForCheckmate(board, moves);
 
         if (allCaptureMoves.Length > 0)
         {
